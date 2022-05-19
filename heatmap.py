@@ -5,6 +5,13 @@ import datetime
 import numpy as np
 
 df = pd.read_csv('pivotFlexBarrier.csv')
+a,b,c,d,e = df.iloc[0], df.iloc[1], df.iloc[2], df.iloc[3], df.iloc[4]
+df2 = df
+df2.iloc[0] = d
+df2.iloc[1] = a
+df2.iloc[2] = c
+df2.iloc[3] = e
+df2.iloc[4] = b
 SensorIDs = df['deviceID'].tolist()
 SensorIDs = [str(i) for i in SensorIDs]
 df = df.drop('Unnamed: 0', 1)
@@ -31,11 +38,21 @@ Jobs = ['JobA','JobB','JobC']
 app = Dash(__name__)
 
 app.layout = html.Div([
-    html.H4('TCK928 - Monitoring Slope No.: 11SE-D/ND9', style={'font-size': '40px', 'textAlign': 'center'}),
-    dcc.Graph(id="graph", responsive=True),
-    dcc.Interval(id="trigger", interval=1000),  # trigger to invoke data refresh attempt, defaults to once per second
+        html.H4('TCK928 - Monitoring Slope No.: 11SE-D/ND9', style={'font-size': '40px', 'textAlign': 'center'}),
+        dcc.Graph(id="graph", responsive=True),
+        dcc.Interval(id="trigger", interval=1000),
+        html.H4('Location of the Slope', style={'font-size': '40px', 'textAlign': 'center'}),
+        html.Div(html.Img(src=app.get_asset_url('slope.jpg')),style={'width': '70%',  'textAlign': 'center', 'display': 'inline-block'}),
+        html.Div([
+            html.P("Sensor A SN: 890771058921"),
+            html.P("Sensor B SN: 890771058913"),
+            html.P("Sensor C SN: 890771058918"),
+            html.P("Sensor D SN: 890771059000"),
+            html.P("Sensor E SN: 890771058915"),
+        ],style={'width': '30%', 'display': 'inline-block'})
 ])
 
+# html.Img(src=app.get_asset_url('slope.jpg'))
 @app.callback(Output("graph", "figure"), Input('trigger', 'interval'))
 def filter_heatmap(cols):
     import plotly.graph_objects as go
