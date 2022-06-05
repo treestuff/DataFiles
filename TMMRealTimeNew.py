@@ -8,8 +8,8 @@ import math
 import statistics
 from furl import furl
 
-treeID = 'TS001'
-slopeID = 'SA1707'
+treeID = 'TS008'
+slopeID = 'SA1745'
 
 def loadDf2(treeID,slopeID):
     import pandas as pd
@@ -284,7 +284,7 @@ app.layout = html.Div(children=[
     # All elements from the top of the page
     html.Div([
         # represents the URL bar, doesn't render anything
-        dcc.Location(id='url', refresh=False),
+        dcc.Location(id='url', refresh=True),
 
         # content will be rendered in this element
         html.Div(id='content'),
@@ -312,7 +312,7 @@ app.layout = html.Div(children=[
         ),
         dcc.Interval(
             id='interval-component2',
-            interval=1 * 1000,  # in milliseconds
+            interval=100 * 1000,  # in milliseconds
             n_intervals=0
         )
     ]),
@@ -326,7 +326,7 @@ app.layout = html.Div(children=[
         ),
         dcc.Interval(
             id='interval-component3',
-            interval=1 * 1000,  # in milliseconds
+            interval=100 * 1000,  # in milliseconds
             n_intervals=0
         )
     ]),
@@ -346,6 +346,8 @@ def update_graph1_live(n):
     if df3.empty:
         Nodata2 = 1
     figs = drawFigs1(Nodata1, Nodata2, df4, df3, figNone)
+    print(treeID)
+    print(slopeID)
     return figs
 
 @app.callback(Output('graph2', 'figure'),
@@ -375,7 +377,15 @@ def _content(href: str):
     slopeID = param2
     return html.H1(children= 'Tree ID: ' + f'{param1}' + '    Slope ID:' + f'{param2}',style={'textAlign': 'center'})
 
+PORT = 8050
+ADDRESS = "0.0.0.0"
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(host=ADDRESS,port=PORT, debug=True, threaded=True)
 
 # http://127.0.0.1:8050/random?param1=TS001&param2=SA1707
+# http://127.0.0.1:8050/random?param1=TS058&param2=SA1860
+# http://127.0.0.1:8050/random?param1=TS001&param2=SA2322
+# http://127.0.0.1:8050/random?param1=TS008&param2=SA1745
+# http://127.0.0.1:8050/random?param1=TS013&param2=SA1745
+# http://127.0.0.1:8050/random?param1=TS015&param2=SA1745
+# http://127.0.0.1:8050/random?param1=TS003&param2=SA1652
