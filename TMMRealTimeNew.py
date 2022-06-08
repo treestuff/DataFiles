@@ -74,7 +74,7 @@ def loadDf4(df2):
     import math
     import statistics
     current_time = datetime.datetime.now()
-    previous_time = current_time - timedelta(hours=6)
+    previous_time = current_time - timedelta(hours=24)
     df2['rs2Time'] = pd.to_datetime(df2['rs2Time'])
     df4 = df2.loc[df2['rs2Time'] >= previous_time]
     return df4
@@ -86,7 +86,7 @@ def loadDf3(df):
     import math
     import statistics
     current_time = datetime.datetime.now()
-    previous_time = current_time - timedelta(hours=6)
+    previous_time = current_time - timedelta(hours=24)
     df['Start'] = pd.to_datetime(df['Start'])
     df['Finish'] = pd.to_datetime(df['Finish'])
     df3 = df.loc[df['Finish'] >= previous_time]
@@ -290,7 +290,7 @@ app.layout = html.Div(children=[
         html.Div(id='content'),
     ]),
     html.Div([
-        html.H1(children='Range of Fluctuation and Timeline of Works in the Past 6 Hours',style={'font-size': '40px','textAlign': 'center'}),
+        html.H1(children='Range of Fluctuation and Timeline of Works in the Past 24 Hours',style={'font-size': '40px','textAlign': 'center'}),
 
         dcc.Graph(
             id='graph1',
@@ -298,7 +298,7 @@ app.layout = html.Div(children=[
         ),
         dcc.Interval(
             id='interval-component1',
-            interval=1 * 1000,  # in milliseconds
+            interval=1000 * 1000,  # in milliseconds
             n_intervals=0
         )
     ]),
@@ -312,7 +312,7 @@ app.layout = html.Div(children=[
         ),
         dcc.Interval(
             id='interval-component2',
-            interval=100 * 1000,  # in milliseconds
+            interval=1000 * 1000,  # in milliseconds
             n_intervals=0
         )
     ]),
@@ -326,7 +326,7 @@ app.layout = html.Div(children=[
         ),
         dcc.Interval(
             id='interval-component3',
-            interval=100 * 1000,  # in milliseconds
+            interval=1000 * 1000,  # in milliseconds
             n_intervals=0
         )
     ]),
@@ -381,7 +381,7 @@ PORT = 8050
 ADDRESS = "0.0.0.0"
 if __name__ == '__main__':
     app.run_server(host=ADDRESS,port=PORT, debug=True, threaded=True)
-
+    #app.run_server(debug=True, threaded=True)
 # http://127.0.0.1:8050/random?param1=TS001&param2=SA1707
 # http://127.0.0.1:8050/random?param1=TS058&param2=SA1860
 # http://127.0.0.1:8050/random?param1=TS001&param2=SA2322
