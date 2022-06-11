@@ -13,6 +13,8 @@ df2.iloc[2] = c
 df2.iloc[3] = e
 df2.iloc[4] = b
 SensorIDs = df['deviceID'].tolist()
+for i in range(0, len(SensorIDs)):
+    SensorIDs[i] = int(SensorIDs[i])
 SensorIDs = [str(i) for i in SensorIDs]
 df = df.drop('Unnamed: 0', 1)
 df = df.drop('deviceID', 1)
@@ -23,18 +25,54 @@ for i, date in enumerate(dates):
     dates[i] = datetime.date.fromisoformat(date)
 dates = np.array(dates)
 
+def reloadData():
+    df = pd.read_csv('pivotFlexBarrier.csv')
+    a, b, c, d, e = df.iloc[0], df.iloc[1], df.iloc[2], df.iloc[3], df.iloc[4]
+    df2 = df
+    df2.iloc[0] = d
+    df2.iloc[1] = a
+    df2.iloc[2] = c
+    df2.iloc[3] = e
+    df2.iloc[4] = b
+    SensorIDs = df['deviceID'].tolist()
+    for i in range(0, len(SensorIDs)):
+        SensorIDs[i] = int(SensorIDs[i])
+    SensorIDs = [str(i) for i in SensorIDs]
+    df = df.drop('Unnamed: 0', 1)
+    df = df.drop('deviceID', 1)
+    z = df.to_numpy()
+
+    dates = list(df)
+    for i, date in enumerate(dates):
+        dates[i] = datetime.date.fromisoformat(date)
+    dates = np.array(dates)
+    return SensorIDs, dates, z
+
 # base = datetime.datetime.today()
 # dates = base - np.arange(90) * datetime.timedelta(days=1)
 # for i in range(0, len(dates)):
 #      dates[i] = dates[i].date()
+#
+# dfWork = pd.DataFrame([
+#     dict(Task="Job A", Start=dates[len(dates)-2], Finish=dates[len(dates)-1],Description='JobA'),
+#     dict(Task="Job B", Start=dates[len(dates)-10], Finish=dates[len(dates)-8],Description='JobB'),
+#     dict(Task="Job C", Start=dates[0], Finish=dates[1],Description='JobC')
+# ])
+dfWork = pd.read_csv('Task_Info_Flex.csv')
+for i in range(0, len(dfWork)):
+    dfWork['Start'][i] = datetime.datetime.strptime(dfWork['Start'][i], '%d/%m/%Y').date()
+for i in range(0, len(dfWork)):
+    dfWork['Finish'][i] = datetime.datetime.strptime(dfWork['Finish'][i], '%d/%m/%Y').date()
 
-dfWork = pd.DataFrame([
-    dict(Task="Job A", Start=dates[len(dates)-2], Finish=dates[len(dates)-1],Description='JobA'),
-    dict(Task="Job B", Start=dates[len(dates)-10], Finish=dates[len(dates)-8],Description='JobB'),
-    dict(Task="Job C", Start=dates[0], Finish=dates[1],Description='JobC')
-])
-Color = ['rgb(0, 0, 0)','rgb(0, 0, 0)','rgb(0, 0, 0)']
-Jobs = ['JobA','JobB','JobC']
+def reloadWork():
+    dfWork = pd.read_csv('Task_Info_Flex.csv')
+    for i in range(0, len(dfWork)):
+        dfWork['Start'][i] = datetime.datetime.strptime(dfWork['Start'][i], '%d/%m/%Y').date()
+    for i in range(0, len(dfWork)):
+        dfWork['Finish'][i] = datetime.datetime.strptime(dfWork['Finish'][i], '%d/%m/%Y').date()
+    return dfWork
+# Color = ['rgb(0, 0, 0)','rgb(0, 0, 0)','rgb(0, 0, 0)']
+# Jobs = ['JobA','JobB','JobC']
 app = Dash(__name__)
 
 app.layout = html.Div([
@@ -65,6 +103,8 @@ def filter_heatmap(cols):
     # df = df.drop('Unnamed: 0', 1)
     # df = df.drop('deviceID', 1)
     # z = df.to_numpy()
+    SensorIDs, dates, z = reloadData()
+    dfWork = reloadWork()
     labels = SensorIDs
     # for i in range(0, len(z)):
     #     if i == 0 or i == 13 or i == 29:
@@ -81,7 +121,7 @@ def filter_heatmap(cols):
         x=dates,
         y=labels,
         colorscale='Viridis', colorbar_y=0.7,colorbar_len=0.6))
-    figg = ff.create_gantt(dfWork, colors=Color, group_tasks=True, index_col='Task', reverse_colors=False, show_colorbar=False)
+    figg = ff.create_gantt(dfWork, group_tasks=True, index_col='Description', reverse_colors=False, show_colorbar=False)
     for trace in figg.data:
         fig.add_trace(trace, row=3, col=1)
     fig.update_layout(title={"text": "Motion Over Time and Works scheduled", "xanchor": "center", "x": 0.53},
@@ -95,6 +135,7 @@ def filter_heatmap(cols):
     fig['layout'].update(margin=dict(l=0, r=0, b=0, t=0))
     fig['layout']['yaxis2']['title'] = 'Weather & Work Records'
     fig.update_xaxes(dtick=86400000.0)
+    fig.update_layout(font={"size": 13})
     return fig
 
 app.run_server(debug=True)

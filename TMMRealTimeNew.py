@@ -57,6 +57,10 @@ def loadDf(treeID,slopeID):
     current_time = datetime.datetime.now()
     previous_time = current_time - timedelta(weeks=12)
     df = pd.read_csv("Tasks_info.csv")
+    for i in range(0, len(df)):
+        df['Start'][i] = datetime.datetime.strptime(df['Start'][i], '%d/%m/%Y').date()
+    for i in range(0, len(df)):
+        df['Finish'][i] = datetime.datetime.strptime(df['Finish'][i], '%d/%m/%Y').date()
     df['slopeID'] = df['slopeID'].fillna(slopeID)
     df['treeID'] = df['treeID'].fillna(treeID)
     df = df.loc[df['slopeID'] == slopeID]
@@ -165,7 +169,7 @@ def drawFigs2(Nodata1,Nodata2,df2,df,figNone):
     import datetime
     import math
     import statistics
-    colors = ['#7a0504', (0.2, 0.7, 0.3), 'rgb(210, 60, 180)']
+    colors = ['#7a0504', (0.2, 0.7, 0.3), 'rgb(210, 60, 180)', 'rgb(180, 120, 10)']
     figs2 = make_subplots(
         rows=3, cols=1,
         shared_xaxes=True,
@@ -383,6 +387,7 @@ if __name__ == '__main__':
     app.run_server(host=ADDRESS,port=PORT, debug=True, threaded=True)
     #app.run_server(debug=True, threaded=True)
 # http://127.0.0.1:8050/random?param1=TS001&param2=SA1707
+# http://127.0.0.1:8050/random?param1=TS001&param2=SA1706
 # http://127.0.0.1:8050/random?param1=TS058&param2=SA1860
 # http://127.0.0.1:8050/random?param1=TS001&param2=SA2322
 # http://127.0.0.1:8050/random?param1=TS008&param2=SA1745
