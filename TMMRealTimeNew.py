@@ -63,8 +63,8 @@ def loadDf(treeID,slopeID):
         df['Finish'][i] = datetime.datetime.strptime(df['Finish'][i], '%d/%m/%Y').date()
     df['slopeID'] = df['slopeID'].fillna(slopeID)
     df['treeID'] = df['treeID'].fillna(treeID)
-    df = df.loc[df['slopeID'] == slopeID]
-    df = df.loc[df['treeID'] == treeID]
+    df = df.loc[(df['slopeID'] == slopeID) | (df['slopeID'] == 'ALL'),:]
+    df = df.loc[(df['treeID'] == treeID)| (df['treeID'] == 'ALL'),:]
     df['Start'] = pd.to_datetime(df['Start'])
     df['Finish'] = pd.to_datetime(df['Finish'])
     df = df.loc[df['Finish'] >= previous_time]
