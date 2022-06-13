@@ -106,6 +106,15 @@ def filter_heatmap(cols):
     SensorIDs, dates, z = reloadData()
     dfWork = reloadWork()
     labels = SensorIDs
+    hovertext = list()
+    for yi, yy in enumerate(labels):
+        hovertext.append(list())
+        for xi, xx in enumerate(dates):
+            hovertext[-1].append('Date: {}<br />Sensor ID: {}<br />Maximum Reading: {}'.format(xx, yy, z[yi][xi]))
+    hovertextWork = list()
+    for i in range(0, len(dfWork)):
+        hovertextWork.append(list())
+        hovertextWork[-1].append('Date: {}<br />Event: {}<br />'.format(dfWork['Start'][i], dfWork['Description'][i]))
     # for i in range(0, len(z)):
     #     if i == 0 or i == 13 or i == 29:
     #         labels.append('Post -' + str(i))
@@ -120,8 +129,9 @@ def filter_heatmap(cols):
         z=z,
         x=dates,
         y=labels,
-        colorscale='Viridis', colorbar_y=0.7,colorbar_len=0.6))
+        colorscale='Viridis', colorbar_y=0.7,colorbar_len=0.6, hoverinfo='text', text=hovertext))
     figg = ff.create_gantt(dfWork, group_tasks=True, index_col='Description', reverse_colors=False, show_colorbar=False)
+    figg.update_traces(hovertemplate="Date:%{x}<br>Event:%{y}")
     for trace in figg.data:
         fig.add_trace(trace, row=3, col=1)
     fig.update_layout(title={"text": "Motion Over Time and Works scheduled", "xanchor": "center", "x": 0.53},
