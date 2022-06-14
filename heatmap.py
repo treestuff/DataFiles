@@ -4,6 +4,9 @@ import pandas as pd
 import datetime
 import numpy as np
 
+slopeID = 0
+sensorID = 0
+
 df = pd.read_csv('pivotFlexBarrier.csv')
 a,b,c,d,e = df.iloc[0], df.iloc[1], df.iloc[2], df.iloc[3], df.iloc[4]
 df2 = df
@@ -63,13 +66,20 @@ for i in range(0, len(dfWork)):
     dfWork['Start'][i] = datetime.datetime.strptime(dfWork['Start'][i], '%d/%m/%Y').date()
 for i in range(0, len(dfWork)):
     dfWork['Finish'][i] = datetime.datetime.strptime(dfWork['Finish'][i], '%d/%m/%Y').date()
-
-def reloadWork():
+dfWork['SlopeID'] = dfWork['SlopeID'].fillna(slopeID)
+dfWork['SensorID'] = dfWork['SensorID'].fillna(sensorID)
+dfWork = dfWork.loc[(dfWork['SlopeID'] == slopeID) | (dfWork['SlopeID'] == 'ALL'), :]
+dfWork = dfWork.loc[(dfWork['SensorID'] == sensorID) | (dfWork['SensorID'] == 'ALL'), :]
+def reloadWork(slopeID, sensorID):
     dfWork = pd.read_csv('Task_Info_Flex.csv')
     for i in range(0, len(dfWork)):
         dfWork['Start'][i] = datetime.datetime.strptime(dfWork['Start'][i], '%d/%m/%Y').date()
     for i in range(0, len(dfWork)):
         dfWork['Finish'][i] = datetime.datetime.strptime(dfWork['Finish'][i], '%d/%m/%Y').date()
+    dfWork['SlopeID'] = dfWork['SlopeID'].fillna(slopeID)
+    dfWork['SensorID'] = dfWork['SensorID'].fillna(sensorID)
+    dfWork = dfWork.loc[(dfWork['SlopeID'] == slopeID) | (dfWork['SlopeID'] == 'ALL'), :]
+    dfWork = dfWork.loc[(dfWork['SensorID'] == sensorID) | (dfWork['SensorID'] == 'ALL'), :]
     return dfWork
 # Color = ['rgb(0, 0, 0)','rgb(0, 0, 0)','rgb(0, 0, 0)']
 # Jobs = ['JobA','JobB','JobC']
@@ -103,8 +113,10 @@ def filter_heatmap(cols):
     # df = df.drop('Unnamed: 0', 1)
     # df = df.drop('deviceID', 1)
     # z = df.to_numpy()
+    slopeID = 0
+    sensorID = 0
     SensorIDs, dates, z = reloadData()
-    dfWork = reloadWork()
+    dfWork = reloadWork(slopeID, sensorID)
     labels = SensorIDs
     hovertext = list()
     for yi, yy in enumerate(labels):

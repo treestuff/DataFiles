@@ -1,3 +1,3 @@
-Task,Start,Finish,Description
-Rainstorm,13/5/2022,14/5/2022,Rainstorm
-Rainstorm,8/6/2022,9/6/2022,Rainstorm
+Task,Start,Finish,Description,SlopeID,SensorID
+Rainstorm,13/5/2022,14/5/2022,Rainstorm,ALL,ALL
+Rainstorm,8/6/2022,9/6/2022,Rainstorm,ALL,ALL
