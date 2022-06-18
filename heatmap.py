@@ -143,7 +143,7 @@ def filter_heatmap(cols):
         y=labels,
         colorscale='Viridis', colorbar_y=0.7,colorbar_len=0.6, hoverinfo='text', text=hovertext))
     figg = ff.create_gantt(dfWork, group_tasks=True, index_col='Description', reverse_colors=False, show_colorbar=False)
-    figg.update_traces(hovertemplate="Date:%{x}<br>Event:%{y}")
+    #figg.update_traces(hoverinfo='text', text=hovertextWork)
     for trace in figg.data:
         fig.add_trace(trace, row=3, col=1)
     fig.update_layout(title={"text": "Motion Over Time and Works scheduled", "xanchor": "center", "x": 0.53},
