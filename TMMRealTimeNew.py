@@ -77,7 +77,7 @@ def loadDf4(df2):
     import datetime
     import math
     import statistics
-    current_time = datetime.datetime.now() + timedelta(hours=-6)
+    current_time = datetime.datetime.now() - timedelta(hours=6)
     previous_time = current_time - timedelta(hours=24)
     df2['rs2Time'] = pd.to_datetime(df2['rs2Time'])
     df4 = df2.loc[df2['rs2Time'] >= previous_time]
@@ -89,7 +89,7 @@ def loadDf3(df):
     import datetime
     import math
     import statistics
-    current_time = datetime.datetime.now()
+    current_time = datetime.datetime.now() - timedelta(hours=6)
     previous_time = current_time - timedelta(hours=24)
     df['Start'] = pd.to_datetime(df['Start'])
     df['Finish'] = pd.to_datetime(df['Finish'])
