@@ -160,5 +160,8 @@ def filter_heatmap(cols):
     fig.update_layout(font={"size": 13})
     return fig
 
-app.run_server(debug=True)
+PORT = 8055
+ADDRESS = "0.0.0.0"
+if __name__ == '__main__':
+    app.run_server(host=ADDRESS,port=PORT, debug=True, threaded=True)
 
