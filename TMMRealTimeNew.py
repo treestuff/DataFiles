@@ -155,7 +155,7 @@ def drawFigs1(Nodata1,Nodata2,df4,df3,figNone):
     else:
         for trace in figNone.data:
             figs.add_trace(trace, row=1, col=1)
-    figs.update_layout(font = {"size": 30})
+    figs.update_layout(font = {"size": 15})
     figs.update_yaxes(range=[-0.5, 0.5], row=1, col=1)
     figs.update_yaxes(visible=False, showticklabels=False,row=3, col=1)
     return figs
@@ -215,7 +215,7 @@ def drawFigs2(Nodata1,Nodata2,df2,df,figNone):
     else:
         for trace in figNone.data:
             figs2.add_trace(trace, row=1, col=1)
-    figs2.update_layout(font = {"size": 30})
+    figs2.update_layout(font = {"size": 15})
     figs2.update_yaxes(range=[-0.5, 0.5], row=1, col=1)
     figs2.update_yaxes(visible=False, showticklabels=False,row=3, col=1)
     return figs2
@@ -246,7 +246,7 @@ def drawFigure3(df2):
         opacity=0.8
     ))
     fig3.update_layout(
-        font={"size": 30},
+        font={"size": 15},
         polar={
             "angularaxis": {"showline": False, "tickcolor": "white", "rotation": 90, "direction": "clockwise",
                         "tickmode": "array", "tickvals": [0, 45, 90, 135, 180, 225, 270, 315],

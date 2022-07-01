@@ -139,7 +139,7 @@ def filter_heatmap(cols):
         [{}],
     ])
     fig.add_trace(go.Heatmap(
-        colorbar={"title": 'Unit of Measure: m/s (approximated assuming stationary)'},
+        colorbar={"title": 'Unit of Measure: m/s <br />(approximated) <br />(assuming stationary)'},
         z=z,
         x=dates,
         y=labels,
