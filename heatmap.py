@@ -20,6 +20,7 @@ for i in range(0, len(SensorIDs)):
     SensorIDs[i] = int(SensorIDs[i])
 SensorIDs = [str(i) for i in SensorIDs]
 df = df.drop('Unnamed: 0', 1)
+df = df.drop('Unnamed: 0.1', 1)
 df = df.drop('deviceID', 1)
 z = df.to_numpy()
 
@@ -42,6 +43,7 @@ def reloadData():
         SensorIDs[i] = int(SensorIDs[i])
     SensorIDs = [str(i) for i in SensorIDs]
     df = df.drop('Unnamed: 0', 1)
+    df = df.drop('Unnamed: 0.1', 1)
     df = df.drop('deviceID', 1)
     z = df.to_numpy()
 
@@ -137,7 +139,7 @@ def filter_heatmap(cols):
         [{}],
     ])
     fig.add_trace(go.Heatmap(
-        colorbar={"title": 'Unit of Measure: g'},
+        colorbar={"title": 'Unit of Measure: m/s (approximated assuming stationary)'},
         z=z,
         x=dates,
         y=labels,
