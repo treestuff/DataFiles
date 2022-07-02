@@ -152,8 +152,8 @@ def drawFigs1(Nodata1,Nodata2,df4,df3,figNone):
     colors = ['#7a0504', (0.2, 0.7, 0.3), 'rgb(210, 60, 180)']
     figs1 = make_subplots(
         rows=3, cols=1,
-        shared_xaxes=True,
-        subplot_titles =('Range of Fluctuation','', 'Timeline of Works and Events'),
+        shared_xaxes=False,
+        subplot_titles =('Range of Fluctuation','', ''),
         specs=[[{"rowspan": 2}], [{}], [{}]]
     )
     if Nodata1 == 0:
@@ -198,6 +198,11 @@ def drawFigs1(Nodata1,Nodata2,df4,df3,figNone):
     figs1.update_yaxes(range=[-0.5, 0.5], row=1, col=1)
     #figs.update_yaxes(range=[1,8], row=1, col=1)
     figs1.update_yaxes(visible=False, showticklabels=False,row=3, col=1)
+    tickvals1 = df2['rs2Time'][0::30]
+    figs1.update_xaxes(tickangle=90,
+                     tickmode='array',
+                     tickvals=df2['rs2Time'][0::30],
+                     ticktext=[d.strftime('%H:%M:%S') for d in tickvals1])
     return figs1
 
 def drawFigs2(Nodata1,Nodata2,df2,df1,figNone):
