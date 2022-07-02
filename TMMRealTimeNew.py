@@ -145,19 +145,18 @@ def drawFigure5(df5):
         figs5.add_trace(trace, row=1, col=1)
     return figs5
 
-def drawFigs1(Nodata1,Nodata2,df4,df3,figNone):
+def drawFigs1(Nodata1,df4,figNone):
     import plotly.graph_objects as go
     import plotly.figure_factory as ff
     from plotly.subplots import make_subplots
     colors = ['#7a0504', (0.2, 0.7, 0.3), 'rgb(210, 60, 180)']
     figs1 = make_subplots(
-        rows=3, cols=1,
+        rows=1, cols=1,
         shared_xaxes=False,
-        subplot_titles =('Range of Fluctuation','', ''),
-        specs=[[{"rowspan": 2}], [{}], [{}]]
+        subplot_titles =('Range of Fluctuation',),
+        specs=[[{}]]
     )
     if Nodata1 == 0:
-        STD = df4['rs2STD'].to_list()
         MeanDiff = df4['MeanDiff'].to_list()
         Time = df4['rs2Time'].to_list()
         df4['YLow'] = df4.apply(lambda row: row.MeanDiff - row.rs2STD, axis=1)
@@ -187,21 +186,13 @@ def drawFigs1(Nodata1,Nodata2,df4,df3,figNone):
     else:
         for trace in figNone.data:
             figs1.add_trace(trace, row=1, col=1)
-    if Nodata2 == 0:
-        figg = ff.create_gantt(df3, colors=colors, index_col='Events', reverse_colors=True, show_colorbar=True)
-        for trace in figg.data:
-            figs1.add_trace(trace, row=3, col=1)
-    else:
-        for trace in figNone.data:
-            figs1.add_trace(trace, row=1, col=1)
     figs1.update_layout(font = {"size": 15})
     figs1.update_yaxes(range=[-0.5, 0.5], row=1, col=1)
-    #figs.update_yaxes(range=[1,8], row=1, col=1)
     figs1.update_yaxes(visible=False, showticklabels=False,row=3, col=1)
-    tickvals1 = df2['rs2Time'][0::30]
+    tickvals1 = df4['rs2Time'][0::20]
     figs1.update_xaxes(tickangle=90,
                      tickmode='array',
-                     tickvals=df2['rs2Time'][0::30],
+                     tickvals=df4['rs2Time'][0::20],
                      ticktext=[d.strftime('%H:%M:%S') for d in tickvals1])
     return figs1
 
@@ -342,7 +333,7 @@ from dash.dependencies import Input, Output
 df2 = loadDf2(treeID,slopeID)
 df1 = loadDf(treeID,slopeID)
 df4 = loadDf4(df2)
-df3 = loadDf3(df1)
+# df3 = loadDf3(df1)
 df5 = loadDf5(treeID,slopeID,24)
 df6 = loadDf6(treeID,slopeID,24)
 figNone = drawFigNone()
@@ -350,9 +341,7 @@ Nodata1 = 0
 if df4.empty:
     Nodata1 = 1
 Nodata2 = 0
-if df3.empty:
-    Nodata2 = 1
-figs1 = drawFigs1(Nodata1,Nodata2,df4,df3,figNone)
+figs1 = drawFigs1(Nodata1,df4,figNone)
 Nodata1 = 0
 if df2.empty:
     Nodata1 = 1
@@ -459,17 +448,12 @@ app.layout = html.Div(children=[
               Input('interval-component1', 'n_intervals'))
 def update_graph1_live(n):
     df2 = loadDf2(treeID,slopeID)
-    df1 = loadDf(treeID,slopeID)
     df4 = loadDf4(df2)
-    df3 = loadDf3(df1)
     figNone = drawFigNone()
     Nodata1 = 0
     if df4.empty:
         Nodata1 = 1
-    Nodata2 = 0
-    if df3.empty:
-        Nodata2 = 1
-    figs1 = drawFigs1(Nodata1, Nodata2, df4, df3, figNone)
+    figs1 = drawFigs1(Nodata1, df4, figNone)
     print(treeID)
     print(slopeID)
     return figs1
