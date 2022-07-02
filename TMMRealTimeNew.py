@@ -31,7 +31,7 @@ def loadDf6(treeID,slopeID):
     df6 = df6.loc[df6['rs2Time'] >= previous_time]
     return df6
 
-def loadDf5(treeID,slopeID):
+def loadDf5(treeID,slopeID, hours):
     import pandas as pd
     from datetime import date, timedelta
     import datetime
@@ -47,7 +47,7 @@ def loadDf5(treeID,slopeID):
     df5 = df5.drop('rawz', 1)
     df5['rs2Time'] = pd.to_datetime(df5['rs2Time'])
     current_time = datetime.datetime.now()
-    previous_time = current_time - timedelta(hours=24)
+    previous_time = current_time - timedelta(hours=hours)
     df5 = df5.loc[df5['rs2Time'] >= previous_time]
     return df5
 
@@ -62,27 +62,30 @@ def loadDf2(treeID,slopeID):
     df2 = df2.loc[df2['treeID'] == treeID]
     current_time = datetime.datetime.now()
     previous_time = current_time - timedelta(weeks=12)
-    means = df2['rs2Mean'].to_list()
-    meanDiff = list()
-    meanDiff.append(0)
-    for i in range(1, len(means)):
-        temp = means[i] - means[i-1]
-        meanDiff.append(temp)
-    Y = df2['rs2ComY'].to_list()
-    X = df2['rs2ComX'].to_list()
-    angle = list()
-    for i in range(0, len(Y)):
-        x = X[i]
-        y = Y[i]
-        if x >= -1000 and x <= 1000:
-            if y >= -1000 and y <= 1000:
-                angle.append(math.degrees(math.atan2(y, x)))
-            else:
-                angle.append(0)
-        else:
-            angle.append(0)
-    df2 = df2.assign(MeanDiff=pd.Series(meanDiff).values)
-    df2 = df2.assign(Angle=pd.Series(angle).values)
+    df2['MeanDiff'] = df2.rs2Mean.diff()
+    df2['Angle'] = df2.apply(lambda row: math.degrees(math.atan2(row.rs2ComY, row.rs2ComX)), axis=1)
+    df2[['MeanDiff', 'Angle']] = df2[['MeanDiff', 'Angle']].fillna(value=0)
+    # means = df2['rs2Mean'].to_list()
+    # meanDiff = list()
+    # meanDiff.append(0)
+    # for i in range(1, len(means)):
+    #     temp = means[i] - means[i-1]
+    #     meanDiff.append(temp)
+    # Y = df2['rs2ComY'].to_list()
+    # X = df2['rs2ComX'].to_list()
+    # angle = list()
+    # for i in range(0, len(Y)):
+    #     x = X[i]
+    #     y = Y[i]
+    #     if x >= -1000 and x <= 1000:
+    #         if y >= -1000 and y <= 1000:
+    #             angle.append(math.degrees(math.atan2(y, x)))
+    #         else:
+    #             angle.append(0)
+    #     else:
+    #         angle.append(0)
+    # df2 = df2.assign(MeanDiff=pd.Series(meanDiff).values)
+    # df2 = df2.assign(Angle=pd.Series(angle).values)
     df2['rs2Time'] = pd.to_datetime(df2['rs2Time'])
     df2 = df2.loc[df2['rs2Time'] >= previous_time]
     return df2
@@ -388,7 +391,7 @@ df2 = loadDf2(treeID,slopeID)
 df1 = loadDf(treeID,slopeID)
 df4 = loadDf4(df2)
 df3 = loadDf3(df1)
-df5 = loadDf5(treeID,slopeID)
+df5 = loadDf5(treeID,slopeID,24)
 df6 = loadDf6(treeID,slopeID)
 figNone = drawFigNone()
 Nodata1 = 0
@@ -468,6 +471,11 @@ app.layout = html.Div(children=[
             id='graph5',
             figure=figs5
         ),
+        dcc.Dropdown(
+            id='fig_dropdown',
+            options=[{'label': '24 Hours', 'value': '24H'},{'label': '48 Hours', 'value': '48H'}],
+            value='24 Hours'
+        ),
         dcc.Interval(
             id='interval-component5',
             interval=1000 * 1000,  # in milliseconds
@@ -524,9 +532,12 @@ def update_graph3_live(n):
     return fig3
 
 @app.callback(Output('graph5', 'figure'),
-              Input('interval-component5', 'n_intervals'))
+              Input('fig_dropdown', 'value'))
 def update_graph5_live(n):
-    df5 = loadDf5(treeID,slopeID)
+    if n == '24H':
+        df5 = loadDf5(treeID,slopeID,24)
+    else:
+        df5 = loadDf5(treeID, slopeID, 48)
     figs5 = drawFigure5(df5)
     return figs5
 
@@ -536,6 +547,16 @@ def update_graph6_live(n):
     df6 = loadDf6(treeID,slopeID)
     figs6 = drawFigure6(df6)
     return figs6
+
+# @app.callback(Output('graph5', 'figure'),
+#               Input('fig_dropdown', 'value'))
+# def update_graph5_fig_dropdown(hours):
+#     if hours == '24H':
+#         df5 = loadDf5(treeID,slopeID,24)
+#     else:
+#         df5 = loadDf5(treeID, slopeID, 48)
+#     figs5 = drawFigure5(df5)
+#     return figs5
 
 @app.callback(Output('content', 'children'),
               [Input('url', 'href')])
