@@ -1,17 +1,10 @@
 import plotly.graph_objects as go
-import plotly.figure_factory as ff
-from plotly.subplots import make_subplots
-import pandas as pd
-from datetime import date, timedelta
-import datetime
-import math
-import statistics
 from furl import furl
 
 treeID = 'TS001'
 slopeID = 'SA2322'
 
-def loadDf6(treeID,slopeID):
+def loadDf6(treeID,slopeID,hours):
     import pandas as pd
     from datetime import date, timedelta
     import datetime
@@ -27,7 +20,7 @@ def loadDf6(treeID,slopeID):
     df6 = df6.drop('rs2ComZ', 1)
     df6 = df6.drop_duplicates(subset='rs2Time', keep="first")
     current_time = datetime.datetime.now()
-    previous_time = current_time - timedelta(hours=24)
+    previous_time = current_time - timedelta(hours=hours)
     df6 = df6.loc[df6['rs2Time'] >= previous_time]
     return df6
 
@@ -65,27 +58,6 @@ def loadDf2(treeID,slopeID):
     df2['MeanDiff'] = df2.rs2Mean.diff()
     df2['Angle'] = df2.apply(lambda row: math.degrees(math.atan2(row.rs2ComY, row.rs2ComX)), axis=1)
     df2[['MeanDiff', 'Angle']] = df2[['MeanDiff', 'Angle']].fillna(value=0)
-    # means = df2['rs2Mean'].to_list()
-    # meanDiff = list()
-    # meanDiff.append(0)
-    # for i in range(1, len(means)):
-    #     temp = means[i] - means[i-1]
-    #     meanDiff.append(temp)
-    # Y = df2['rs2ComY'].to_list()
-    # X = df2['rs2ComX'].to_list()
-    # angle = list()
-    # for i in range(0, len(Y)):
-    #     x = X[i]
-    #     y = Y[i]
-    #     if x >= -1000 and x <= 1000:
-    #         if y >= -1000 and y <= 1000:
-    #             angle.append(math.degrees(math.atan2(y, x)))
-    #         else:
-    #             angle.append(0)
-    #     else:
-    #         angle.append(0)
-    # df2 = df2.assign(MeanDiff=pd.Series(meanDiff).values)
-    # df2 = df2.assign(Angle=pd.Series(angle).values)
     df2['rs2Time'] = pd.to_datetime(df2['rs2Time'])
     df2 = df2.loc[df2['rs2Time'] >= previous_time]
     return df2
@@ -133,22 +105,18 @@ def loadDf3(df1):
     return df3
 
 def drawFigNone():
-    figNone = go.Figure().add_annotation(x=2, y=2,text="No Data to Display",font=dict(family="sans serif",size=25,color="crimson"),showarrow=False,yshift=10)
+    figNone = go.Figure().add_annotation(x=10, y=10,text="No Data to Display",font=dict(family="sans serif",size=25,color="crimson"),showarrow=False,yshift=10)
     return figNone
 
 def drawFigure5(df5):
     import plotly.graph_objects as go
-    import plotly.figure_factory as ff
     from plotly.subplots import make_subplots
-    STD = df5['rs2STD'].to_list()
     MeanDiff = df5['rs2Mean'].to_list()
     Time = df5['rs2Time'].to_list()
-    colors = ['#7a0504', (0.2, 0.7, 0.3), 'rgb(210, 60, 180)', 'rgb(180, 120, 10)']
-    YLow = list()
-    YHigh = list()
-    for i in range(0, len(MeanDiff)):
-        YLow.append(MeanDiff[i] - STD[i])
-        YHigh.append(MeanDiff[i] + STD[i])
+    df5['YLow'] = df5.apply(lambda row: row.rs2Mean - row.rs2STD, axis=1)
+    df5['YHigh'] = df5.apply(lambda row: row.rs2Mean + row.rs2STD, axis=1)
+    YLow = df5['YLow'].to_list()
+    YHigh = df5['YHigh'].to_list()
     figs5 = make_subplots(
         rows=1, cols=1,
         shared_xaxes=False,
@@ -161,7 +129,7 @@ def drawFigure5(df5):
             y=MeanDiff,
             line=dict(color='rgb(0,100,80)'),
             mode='lines',
-            name="R2"
+            name="Mean R-squared"
         ),
         go.Scatter(
             x=Time + Time[::-1],  # x, then x reversed
@@ -181,11 +149,6 @@ def drawFigs1(Nodata1,Nodata2,df4,df3,figNone):
     import plotly.graph_objects as go
     import plotly.figure_factory as ff
     from plotly.subplots import make_subplots
-    import pandas as pd
-    from datetime import date, timedelta
-    import datetime
-    import math
-    import statistics
     colors = ['#7a0504', (0.2, 0.7, 0.3), 'rgb(210, 60, 180)']
     figs1 = make_subplots(
         rows=3, cols=1,
@@ -197,11 +160,10 @@ def drawFigs1(Nodata1,Nodata2,df4,df3,figNone):
         STD = df4['rs2STD'].to_list()
         MeanDiff = df4['MeanDiff'].to_list()
         Time = df4['rs2Time'].to_list()
-        YLow = list()
-        YHigh = list()
-        for i in range(0, len(MeanDiff)):
-            YLow.append(MeanDiff[i] - STD[i])
-            YHigh.append(MeanDiff[i] + STD[i])
+        df4['YLow'] = df4.apply(lambda row: row.MeanDiff - row.rs2STD, axis=1)
+        df4['YHigh'] = df4.apply(lambda row: row.MeanDiff + row.rs2STD, axis=1)
+        YLow = df4['YLow'].to_list()
+        YHigh = df4['YHigh'].to_list()
         fig = go.Figure([
                 go.Scatter(
                     x=Time,
@@ -242,11 +204,6 @@ def drawFigs2(Nodata1,Nodata2,df2,df1,figNone):
     import plotly.graph_objects as go
     import plotly.figure_factory as ff
     from plotly.subplots import make_subplots
-    import pandas as pd
-    from datetime import date, timedelta
-    import datetime
-    import math
-    import statistics
     colors = ['#7a0504', (0.2, 0.7, 0.3), 'rgb(210, 60, 180)', 'rgb(180, 120, 10)']
     figs2 = make_subplots(
         rows=3, cols=1,
@@ -258,11 +215,10 @@ def drawFigs2(Nodata1,Nodata2,df2,df1,figNone):
         STD = df2['rs2STD'].to_list()
         MeanDiff = df2['MeanDiff'].to_list()
         Time = df2['rs2Time'].to_list()
-        YLow = list()
-        YHigh = list()
-        for i in range(0, len(MeanDiff)):
-            YLow.append(MeanDiff[i] - STD[i])
-            YHigh.append(MeanDiff[i] + STD[i])
+        df2['YLow'] = df2.apply(lambda row: row.MeanDiff - row.rs2STD, axis=1)
+        df2['YHigh'] = df2.apply(lambda row: row.MeanDiff + row.rs2STD, axis=1)
+        YLow = df2['YLow'].to_list()
+        YHigh = df2['YHigh'].to_list()
         fig = go.Figure([
                 go.Scatter(
                     x=Time,
@@ -296,22 +252,20 @@ def drawFigs2(Nodata1,Nodata2,df2,df1,figNone):
     figs2.update_layout(font = {"size": 15})
     figs2.update_yaxes(range=[-0.5, 0.5], row=1, col=1)
     figs2.update_yaxes(visible=False, showticklabels=False,row=3, col=1)
+    tickvals = df2['rs2Time'][0::180]
+    figs2.update_xaxes(tickangle=90,
+                     tickmode='array',
+                     tickvals=df2['rs2Time'][0::180],
+                     ticktext=[d.strftime('%Y-%m-%d') for d in tickvals])
     return figs2
 
 def drawFigure3(df2):
     import plotly.graph_objects as go
-    import plotly.figure_factory as ff
-    from plotly.subplots import make_subplots
-    import pandas as pd
-    from datetime import date, timedelta
-    import datetime
-    import math
     import statistics
     r = df2['MeanDiff'].to_list()
     theta = df2['Angle'].to_list()
     radius = [0, statistics.mean(r) * 0.65, statistics.mean(r) * 0.65, 0]
     theta = [i for i in theta if i != 0]
-    #theta = [abs(x) for x in theta
     direction = [0, min(theta), max(theta), 0]
     radius = [0, 1, 1, 0]
     fig3 = go.Figure(go.Scatterpolar(
@@ -337,18 +291,11 @@ def drawFigure3(df2):
 
 def drawFigure6(df6):
     import plotly.graph_objects as go
-    import plotly.figure_factory as ff
     from plotly.subplots import make_subplots
-    import pandas as pd
-    from datetime import date, timedelta
-    import datetime
-    import math
-    import statistics
     rawx = df6['rawx'].to_list()
     rawy = df6['rawy'].to_list()
     rawz = df6['rawz'].to_list()
     Time = df6['rs2Time'].to_list()
-    colors = ['#7a0504', (0.2, 0.7, 0.3), 'rgb(210, 60, 180)', 'rgb(180, 120, 10)']
     figs6 = make_subplots(
         rows=1, cols=1,
         shared_xaxes=False,
@@ -392,7 +339,7 @@ df1 = loadDf(treeID,slopeID)
 df4 = loadDf4(df2)
 df3 = loadDf3(df1)
 df5 = loadDf5(treeID,slopeID,24)
-df6 = loadDf6(treeID,slopeID)
+df6 = loadDf6(treeID,slopeID,24)
 figNone = drawFigNone()
 Nodata1 = 0
 if df4.empty:
@@ -464,7 +411,7 @@ app.layout = html.Div(children=[
         )
     ]),
     html.Div([
-        html.H1(children='Mean Levels of Movements in the Past 24 Hours',
+        html.H1(children='Mean Levels of Movements in the Past 24-72 Hours',
                 style={'font-size': '40px', 'textAlign': 'center'}),
 
         dcc.Graph(
@@ -473,8 +420,8 @@ app.layout = html.Div(children=[
         ),
         dcc.Dropdown(
             id='fig_dropdown',
-            options=[{'label': '24 Hours', 'value': '24H'},{'label': '48 Hours', 'value': '48H'}],
-            value='24 Hours'
+            options=[{'label': '24 Hours', 'value': '24H'},{'label': '48 Hours', 'value': '48H'},{'label': '72 Hours', 'value': '72H'}],
+            value='24H'
         ),
         dcc.Interval(
             id='interval-component5',
@@ -483,12 +430,18 @@ app.layout = html.Div(children=[
         )
     ]),
     html.Div([
-        html.H1(children='Maximum Movements of the Axises in the Past 24 Hours',
+        html.H1(children='Maximum Movements of the Axises in the Past 24-72 Hours',
                 style={'font-size': '40px', 'textAlign': 'center'}),
 
         dcc.Graph(
             id='graph6',
             figure=figs6
+        ),
+        dcc.Dropdown(
+            id='fig_dropdown2',
+            options=[{'label': '24 Hours', 'value': '24H'}, {'label': '48 Hours', 'value': '48H'},
+                     {'label': '72 Hours', 'value': '72H'}],
+            value='24H'
         ),
         dcc.Interval(
             id='interval-component6',
@@ -536,27 +489,24 @@ def update_graph3_live(n):
 def update_graph5_live(n):
     if n == '24H':
         df5 = loadDf5(treeID,slopeID,24)
-    else:
+    elif n == '48H':
         df5 = loadDf5(treeID, slopeID, 48)
+    else:
+        df5 = loadDf5(treeID, slopeID, 72)
     figs5 = drawFigure5(df5)
     return figs5
 
 @app.callback(Output('graph6', 'figure'),
-              Input('interval-component6', 'n_intervals'))
+              Input('fig_dropdown2', 'value'))
 def update_graph6_live(n):
-    df6 = loadDf6(treeID,slopeID)
+    if n == '24H':
+        df6 = loadDf6(treeID,slopeID,24)
+    elif n == '48H':
+        df6 = loadDf6(treeID, slopeID, 48)
+    else:
+        df6 = loadDf6(treeID, slopeID, 72)
     figs6 = drawFigure6(df6)
     return figs6
-
-# @app.callback(Output('graph5', 'figure'),
-#               Input('fig_dropdown', 'value'))
-# def update_graph5_fig_dropdown(hours):
-#     if hours == '24H':
-#         df5 = loadDf5(treeID,slopeID,24)
-#     else:
-#         df5 = loadDf5(treeID, slopeID, 48)
-#     figs5 = drawFigure5(df5)
-#     return figs5
 
 @app.callback(Output('content', 'children'),
               [Input('url', 'href')])
