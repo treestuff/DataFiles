@@ -8,15 +8,54 @@ import math
 import statistics
 from furl import furl
 
-treeID = 'TS008'
-slopeID = 'SA1745'
+treeID = 'TS001'
+slopeID = 'SA2322'
+
+def loadDf6(treeID,slopeID):
+    import pandas as pd
+    from datetime import date, timedelta
+    import datetime
+    df6 = pd.read_csv("DataCumulated2.csv")
+    df6 = df6.sort_values('rs2Time')
+    df6 = df6.loc[df6['slopeID'] == slopeID]
+    df6 = df6.loc[df6['treeID'] == treeID]
+    df6['rs2Time'] = pd.to_datetime(df6['rs2Time'])
+    df6 = df6.drop('rs2Mean', 1)
+    df6 = df6.drop('rs2STD', 1)
+    df6 = df6.drop('rs2ComX', 1)
+    df6 = df6.drop('rs2ComY', 1)
+    df6 = df6.drop('rs2ComZ', 1)
+    df6 = df6.drop_duplicates(subset='rs2Time', keep="first")
+    current_time = datetime.datetime.now()
+    previous_time = current_time - timedelta(hours=24)
+    df6 = df6.loc[df6['rs2Time'] >= previous_time]
+    return df6
+
+def loadDf5(treeID,slopeID):
+    import pandas as pd
+    from datetime import date, timedelta
+    import datetime
+    df5 = pd.read_csv("DataCumulated2.csv")
+    df5 = df5.sort_values('rs2Time')
+    df5 = df5.loc[df5['slopeID'] == slopeID]
+    df5 = df5.loc[df5['treeID'] == treeID]
+    df5 = df5.drop('rs2ComX', 1)
+    df5 = df5.drop('rs2ComY', 1)
+    df5 = df5.drop('rs2ComZ', 1)
+    df5 = df5.drop('rawx', 1)
+    df5 = df5.drop('rawy', 1)
+    df5 = df5.drop('rawz', 1)
+    df5['rs2Time'] = pd.to_datetime(df5['rs2Time'])
+    current_time = datetime.datetime.now()
+    previous_time = current_time - timedelta(hours=24)
+    df5 = df5.loc[df5['rs2Time'] >= previous_time]
+    return df5
 
 def loadDf2(treeID,slopeID):
     import pandas as pd
     from datetime import date, timedelta
     import datetime
     import math
-    import statistics
     df2 = pd.read_csv("DataCumulated2.csv")
     df2 = df2.sort_values('rs2Time')
     df2 = df2.loc[df2['slopeID'] == slopeID]
@@ -52,53 +91,88 @@ def loadDf(treeID,slopeID):
     import pandas as pd
     from datetime import date, timedelta
     import datetime
-    import math
-    import statistics
     current_time = datetime.datetime.now()
     previous_time = current_time - timedelta(weeks=12)
-    df = pd.read_csv("Tasks_info.csv")
-    for i in range(0, len(df)):
-        df['Start'][i] = datetime.datetime.strptime(df['Start'][i], '%d/%m/%Y').date()
-    for i in range(0, len(df)):
-        df['Finish'][i] = datetime.datetime.strptime(df['Finish'][i], '%d/%m/%Y').date()
-    df['slopeID'] = df['slopeID'].fillna(slopeID)
-    df['treeID'] = df['treeID'].fillna(treeID)
-    df = df.loc[(df['slopeID'] == slopeID) | (df['slopeID'] == 'ALL'),:]
-    df = df.loc[(df['treeID'] == treeID)| (df['treeID'] == 'ALL'),:]
-    df['Start'] = pd.to_datetime(df['Start'])
-    df['Finish'] = pd.to_datetime(df['Finish'])
-    df = df.loc[df['Finish'] >= previous_time]
-    df = df.sort_values('Finish')
-    return df
+    df1 = pd.read_csv("Tasks_info.csv")
+    for i in range(0, len(df1)):
+        df1['Start'][i] = datetime.datetime.strptime(df1['Start'][i], '%d/%m/%Y').date()
+    for i in range(0, len(df1)):
+        df1['Finish'][i] = datetime.datetime.strptime(df1['Finish'][i], '%d/%m/%Y').date()
+    df1['slopeID'] = df1['slopeID'].fillna(slopeID)
+    df1['treeID'] = df1['treeID'].fillna(treeID)
+    df1 = df1.loc[(df1['slopeID'] == slopeID) | (df1['slopeID'] == 'ALL'),:]
+    df1 = df1.loc[(df1['treeID'] == treeID)| (df1['treeID'] == 'ALL'),:]
+    df1['Start'] = pd.to_datetime(df1['Start'])
+    df1['Finish'] = pd.to_datetime(df1['Finish'])
+    df1 = df1.loc[df1['Finish'] >= previous_time]
+    df1 = df1.sort_values('Finish')
+    return df1
 
 def loadDf4(df2):
     import pandas as pd
     from datetime import date, timedelta
     import datetime
-    import math
-    import statistics
     current_time = datetime.datetime.now() - timedelta(hours=6)
     previous_time = current_time - timedelta(hours=24)
     df2['rs2Time'] = pd.to_datetime(df2['rs2Time'])
     df4 = df2.loc[df2['rs2Time'] >= previous_time]
     return df4
 
-def loadDf3(df):
+def loadDf3(df1):
     import pandas as pd
     from datetime import date, timedelta
     import datetime
-    import math
-    import statistics
     current_time = datetime.datetime.now() - timedelta(hours=6)
     previous_time = current_time - timedelta(hours=24)
-    df['Start'] = pd.to_datetime(df['Start'])
-    df['Finish'] = pd.to_datetime(df['Finish'])
-    df3 = df.loc[df['Finish'] >= previous_time]
+    df1['Start'] = pd.to_datetime(df1['Start'])
+    df1['Finish'] = pd.to_datetime(df1['Finish'])
+    df3 = df1.loc[df1['Finish'] >= previous_time]
     return df3
 
 def drawFigNone():
     figNone = go.Figure().add_annotation(x=2, y=2,text="No Data to Display",font=dict(family="sans serif",size=25,color="crimson"),showarrow=False,yshift=10)
     return figNone
+
+def drawFigure5(df5):
+    import plotly.graph_objects as go
+    import plotly.figure_factory as ff
+    from plotly.subplots import make_subplots
+    STD = df5['rs2STD'].to_list()
+    MeanDiff = df5['rs2Mean'].to_list()
+    Time = df5['rs2Time'].to_list()
+    colors = ['#7a0504', (0.2, 0.7, 0.3), 'rgb(210, 60, 180)', 'rgb(180, 120, 10)']
+    YLow = list()
+    YHigh = list()
+    for i in range(0, len(MeanDiff)):
+        YLow.append(MeanDiff[i] - STD[i])
+        YHigh.append(MeanDiff[i] + STD[i])
+    figs5 = make_subplots(
+        rows=1, cols=1,
+        shared_xaxes=False,
+        subplot_titles =(),
+        specs=[[{}]]
+    )
+    fig = go.Figure([
+        go.Scatter(
+            x=Time,
+            y=MeanDiff,
+            line=dict(color='rgb(0,100,80)'),
+            mode='lines',
+            name="R2"
+        ),
+        go.Scatter(
+            x=Time + Time[::-1],  # x, then x reversed
+            y=YHigh + YLow[::-1],  # upper, then lower reversed
+            fill='toself',
+            fillcolor='rgba(0,100,80,0.2)',
+            line=dict(color='rgba(255,255,255,0)'),
+            hoverinfo="skip",
+            showlegend=False
+        )
+    ])
+    for trace in fig.data:
+        figs5.add_trace(trace, row=1, col=1)
+    return figs5
 
 def drawFigs1(Nodata1,Nodata2,df4,df3,figNone):
     import plotly.graph_objects as go
@@ -110,7 +184,7 @@ def drawFigs1(Nodata1,Nodata2,df4,df3,figNone):
     import math
     import statistics
     colors = ['#7a0504', (0.2, 0.7, 0.3), 'rgb(210, 60, 180)']
-    figs = make_subplots(
+    figs1 = make_subplots(
         rows=3, cols=1,
         shared_xaxes=True,
         subplot_titles =('Range of Fluctuation','', 'Timeline of Works and Events'),
@@ -144,23 +218,24 @@ def drawFigs1(Nodata1,Nodata2,df4,df3,figNone):
                 )
             ])
         for trace in fig.data:
-            figs.add_trace(trace, row=1, col=1)
+            figs1.add_trace(trace, row=1, col=1)
     else:
         for trace in figNone.data:
-            figs.add_trace(trace, row=1, col=1)
+            figs1.add_trace(trace, row=1, col=1)
     if Nodata2 == 0:
         figg = ff.create_gantt(df3, colors=colors, index_col='Events', reverse_colors=True, show_colorbar=True)
         for trace in figg.data:
-            figs.add_trace(trace, row=3, col=1)
+            figs1.add_trace(trace, row=3, col=1)
     else:
         for trace in figNone.data:
-            figs.add_trace(trace, row=1, col=1)
-    figs.update_layout(font = {"size": 15})
-    figs.update_yaxes(range=[-0.5, 0.5], row=1, col=1)
-    figs.update_yaxes(visible=False, showticklabels=False,row=3, col=1)
-    return figs
+            figs1.add_trace(trace, row=1, col=1)
+    figs1.update_layout(font = {"size": 15})
+    figs1.update_yaxes(range=[-0.5, 0.5], row=1, col=1)
+    #figs.update_yaxes(range=[1,8], row=1, col=1)
+    figs1.update_yaxes(visible=False, showticklabels=False,row=3, col=1)
+    return figs1
 
-def drawFigs2(Nodata1,Nodata2,df2,df,figNone):
+def drawFigs2(Nodata1,Nodata2,df2,df1,figNone):
     import plotly.graph_objects as go
     import plotly.figure_factory as ff
     from plotly.subplots import make_subplots
@@ -209,7 +284,7 @@ def drawFigs2(Nodata1,Nodata2,df2,df,figNone):
         for trace in figNone.data:
             figs2.add_trace(trace, row=1, col=1)
     if Nodata2 == 0:
-        figg = ff.create_gantt(df, colors=colors, index_col='Events', reverse_colors=True, show_colorbar=True)
+        figg = ff.create_gantt(df1, colors=colors, index_col='Events', reverse_colors=True, show_colorbar=True)
         for trace in figg.data:
             figs2.add_trace(trace, row=3, col=1)
     else:
@@ -257,15 +332,64 @@ def drawFigure3(df2):
     fig3.update_polars(radialaxis_showticklabels=False)
     return fig3
 
+def drawFigure6(df6):
+    import plotly.graph_objects as go
+    import plotly.figure_factory as ff
+    from plotly.subplots import make_subplots
+    import pandas as pd
+    from datetime import date, timedelta
+    import datetime
+    import math
+    import statistics
+    rawx = df6['rawx'].to_list()
+    rawy = df6['rawy'].to_list()
+    rawz = df6['rawz'].to_list()
+    Time = df6['rs2Time'].to_list()
+    colors = ['#7a0504', (0.2, 0.7, 0.3), 'rgb(210, 60, 180)', 'rgb(180, 120, 10)']
+    figs6 = make_subplots(
+        rows=1, cols=1,
+        shared_xaxes=False,
+        subplot_titles=(),
+        specs=[[{}]]
+    )
+    fig = go.Figure([
+        go.Scatter(
+            x=Time,
+            y=rawx,
+            line=dict(color='rgb(255,0,0)'),
+            mode='lines',
+            name="Maximum X"
+        ),
+        go.Scatter(
+            x=Time,
+            y=rawy,
+            line=dict(color='rgb(0,255,0)'),
+            mode='lines',
+            name="Maximum Y"
+        ),
+        go.Scatter(
+            x=Time,
+            y=rawz,
+            line=dict(color='rgb(0,0,255)'),
+            mode='lines',
+            name="Maximum Z"
+        ),
+    ])
+    for trace in fig.data:
+        figs6.add_trace(trace, row=1, col=1)
+    return figs6
+
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
 
 df2 = loadDf2(treeID,slopeID)
-df = loadDf(treeID,slopeID)
+df1 = loadDf(treeID,slopeID)
 df4 = loadDf4(df2)
-df3 = loadDf3(df)
+df3 = loadDf3(df1)
+df5 = loadDf5(treeID,slopeID)
+df6 = loadDf6(treeID,slopeID)
 figNone = drawFigNone()
 Nodata1 = 0
 if df4.empty:
@@ -273,15 +397,17 @@ if df4.empty:
 Nodata2 = 0
 if df3.empty:
     Nodata2 = 1
-figs = drawFigs1(Nodata1,Nodata2,df4,df3,figNone)
+figs1 = drawFigs1(Nodata1,Nodata2,df4,df3,figNone)
 Nodata1 = 0
 if df2.empty:
     Nodata1 = 1
 Nodata2 = 0
-if df.empty:
+if df1.empty:
     Nodata2 = 1
-figs2 = drawFigs2(Nodata1,Nodata2,df2,df,figNone)
+figs2 = drawFigs2(Nodata1,Nodata2,df2,df1,figNone)
 fig3 = drawFigure3(df2)
+figs5 = drawFigure5(df5)
+figs6 = drawFigure6(df6)
 app = dash.Dash(__name__)
 
 app.layout = html.Div(children=[
@@ -298,7 +424,7 @@ app.layout = html.Div(children=[
 
         dcc.Graph(
             id='graph1',
-            figure=figs
+            figure=figs1
         ),
         dcc.Interval(
             id='interval-component1',
@@ -334,14 +460,42 @@ app.layout = html.Div(children=[
             n_intervals=0
         )
     ]),
+    html.Div([
+        html.H1(children='Mean Levels of Movements in the Past 24 Hours',
+                style={'font-size': '40px', 'textAlign': 'center'}),
+
+        dcc.Graph(
+            id='graph5',
+            figure=figs5
+        ),
+        dcc.Interval(
+            id='interval-component5',
+            interval=1000 * 1000,  # in milliseconds
+            n_intervals=0
+        )
+    ]),
+    html.Div([
+        html.H1(children='Maximum Movements of the Axises in the Past 24 Hours',
+                style={'font-size': '40px', 'textAlign': 'center'}),
+
+        dcc.Graph(
+            id='graph6',
+            figure=figs6
+        ),
+        dcc.Interval(
+            id='interval-component6',
+            interval=1000 * 1000,  # in milliseconds
+            n_intervals=0
+        )
+    ]),
 ])
 @app.callback(Output('graph1', 'figure'),
               Input('interval-component1', 'n_intervals'))
 def update_graph1_live(n):
     df2 = loadDf2(treeID,slopeID)
-    df = loadDf(treeID,slopeID)
+    df1 = loadDf(treeID,slopeID)
     df4 = loadDf4(df2)
-    df3 = loadDf3(df)
+    df3 = loadDf3(df1)
     figNone = drawFigNone()
     Nodata1 = 0
     if df4.empty:
@@ -349,17 +503,17 @@ def update_graph1_live(n):
     Nodata2 = 0
     if df3.empty:
         Nodata2 = 1
-    figs = drawFigs1(Nodata1, Nodata2, df4, df3, figNone)
+    figs1 = drawFigs1(Nodata1, Nodata2, df4, df3, figNone)
     print(treeID)
     print(slopeID)
-    return figs
+    return figs1
 
 @app.callback(Output('graph2', 'figure'),
               Input('interval-component2', 'n_intervals'))
 def update_graph2_live(n):
     df2 = loadDf2(treeID,slopeID)
-    df = loadDf(treeID,slopeID)
-    figs2 = drawFigs2(Nodata1,Nodata2,df2,df,figNone)
+    df1 = loadDf(treeID,slopeID)
+    figs2 = drawFigs2(Nodata1,Nodata2,df2,df1,figNone)
     return figs2
 
 @app.callback(Output('graph3', 'figure'),
@@ -368,6 +522,20 @@ def update_graph3_live(n):
     df2 = loadDf2(treeID,slopeID)
     fig3 = drawFigure3(df2)
     return fig3
+
+@app.callback(Output('graph5', 'figure'),
+              Input('interval-component5', 'n_intervals'))
+def update_graph5_live(n):
+    df5 = loadDf5(treeID,slopeID)
+    figs5 = drawFigure5(df5)
+    return figs5
+
+@app.callback(Output('graph6', 'figure'),
+              Input('interval-component6', 'n_intervals'))
+def update_graph6_live(n):
+    df6 = loadDf6(treeID,slopeID)
+    figs6 = drawFigure6(df6)
+    return figs6
 
 @app.callback(Output('content', 'children'),
               [Input('url', 'href')])
