@@ -405,7 +405,7 @@ app.layout = html.Div(children=[
         )
     ]),
     html.Div([
-        html.H1(children='Mean Levels of Movements in the Past 24-72 Hours',
+        html.H1(children='Mean Levels of Movements in the Past 24-120 Hours',
                 style={'font-size': '40px', 'textAlign': 'center'}),
 
         dcc.Graph(
@@ -414,7 +414,7 @@ app.layout = html.Div(children=[
         ),
         dcc.Dropdown(
             id='fig_dropdown',
-            options=[{'label': '24 Hours', 'value': '24H'},{'label': '48 Hours', 'value': '48H'},{'label': '72 Hours', 'value': '72H'}],
+            options=[{'label': '24 Hours', 'value': '24H'},{'label': '48 Hours', 'value': '48H'},{'label': '72 Hours', 'value': '72H'},{'label': '96 Hours', 'value': '96H'},{'label': '120 Hours', 'value': '120H'}],
             value='24H'
         ),
         dcc.Interval(
@@ -424,7 +424,7 @@ app.layout = html.Div(children=[
         )
     ]),
     html.Div([
-        html.H1(children='Maximum Movements of the Axises in the Past 24-72 Hours',
+        html.H1(children='Maximum Movements of the Axises in the Past 24-120 Hours',
                 style={'font-size': '40px', 'textAlign': 'center'}),
 
         dcc.Graph(
@@ -434,7 +434,7 @@ app.layout = html.Div(children=[
         dcc.Dropdown(
             id='fig_dropdown2',
             options=[{'label': '24 Hours', 'value': '24H'}, {'label': '48 Hours', 'value': '48H'},
-                     {'label': '72 Hours', 'value': '72H'}],
+                     {'label': '72 Hours', 'value': '72H'},{'label': '96 Hours', 'value': '96H'},{'label': '120 Hours', 'value': '120H'}],
             value='24H'
         ),
         dcc.Interval(
@@ -480,8 +480,12 @@ def update_graph5_live(n):
         df5 = loadDf5(treeID,slopeID,24)
     elif n == '48H':
         df5 = loadDf5(treeID, slopeID, 48)
-    else:
+    elif n == '72H':
         df5 = loadDf5(treeID, slopeID, 72)
+    elif n == '96H':
+        df5 = loadDf5(treeID, slopeID, 96)
+    else:
+        df5 = loadDf5(treeID, slopeID, 120)
     figs5 = drawFigure5(df5)
     return figs5
 
@@ -492,8 +496,12 @@ def update_graph6_live(n):
         df6 = loadDf6(treeID,slopeID,24)
     elif n == '48H':
         df6 = loadDf6(treeID, slopeID, 48)
-    else:
+    elif n == '72H':
         df6 = loadDf6(treeID, slopeID, 72)
+    elif n == '96H':
+        df6 = loadDf6(treeID, slopeID, 96)
+    else:
+        df6 = loadDf6(treeID, slopeID, 120)
     figs6 = drawFigure6(df6)
     return figs6
 
