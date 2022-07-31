@@ -4,6 +4,15 @@ from furl import furl
 treeID = 'TS001'
 slopeID = 'SA2322'
 
+def loadDf7(treeID,slopeID):
+    import pandas as pd
+    df7 = pd.read_csv('CumulativeDailyWarning.csv')
+    df7 = df7.drop('Unnamed: 0', 1)
+    df7 = df7.drop('Date compared', 1)
+    df7 = df7.loc[df7['Slope IDs'] == slopeID]
+    df7 = df7.loc[df7['Tree IDs'] == treeID]
+    return df7
+
 def loadDf6(treeID,slopeID,hours):
     import pandas as pd
     from datetime import date, timedelta
@@ -329,6 +338,7 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+from dash import dash_table
 
 df2 = loadDf2(treeID,slopeID)
 df1 = loadDf(treeID,slopeID)
@@ -336,6 +346,7 @@ df4 = loadDf4(df2)
 # df3 = loadDf3(df1)
 df5 = loadDf5(treeID,slopeID,24)
 df6 = loadDf6(treeID,slopeID,24)
+df7 = loadDf7(treeID,slopeID)
 figNone = drawFigNone()
 Nodata1 = 0
 if df4.empty:
@@ -443,6 +454,14 @@ app.layout = html.Div(children=[
             n_intervals=0
         )
     ]),
+    html.Div([
+        dash_table.DataTable(id='tbl'),
+        dcc.Interval(
+            id='interval-component7',
+            interval=1000 * 1000,  # in milliseconds
+            n_intervals=0
+        )
+    ]),
 ])
 @app.callback(Output('graph1', 'figure'),
               Input('interval-component1', 'n_intervals'))
@@ -505,6 +524,13 @@ def update_graph6_live(n):
     figs6 = drawFigure6(df6)
     return figs6
 
+@app.callback(Output('tbl', 'data'),
+              Input('interval-component7', 'n_intervals'))
+def update_tbl_live(n):
+    df7 = loadDf7(treeID, slopeID)
+    # tbl = dash_table.DataTable(data=df7.to_dict('records'), id='tbl')
+    return df7.to_dict('records')
+
 @app.callback(Output('content', 'children'),
               [Input('url', 'href')])
 def _content(href: str):
@@ -530,3 +556,4 @@ if __name__ == '__main__':
 # http://127.0.0.1:8050/random?param1=TS013&param2=SA1745
 # http://127.0.0.1:8050/random?param1=TS015&param2=SA1745
 # http://127.0.0.1:8050/random?param1=TS003&param2=SA1652
+
