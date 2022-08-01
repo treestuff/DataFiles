@@ -7,7 +7,7 @@ slopeID = 'SA2322'
 def loadDf7(treeID,slopeID):
     import pandas as pd
     df7 = pd.read_csv('CumulativeDailyWarning.csv')
-    df7 = df7.drop('Unnamed: 0', 1)
+    # df7 = df7.drop('Unnamed: 0', 1)
     df7 = df7.drop('Date compared', 1)
     df7 = df7.loc[df7['Slope IDs'] == slopeID]
     df7 = df7.loc[df7['Tree IDs'] == treeID]
