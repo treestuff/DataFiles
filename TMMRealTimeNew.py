@@ -138,7 +138,7 @@ def drawFigure5(df5):
             y=MeanDiff,
             line=dict(color='rgb(0,100,80)'),
             mode='lines',
-            name="Mean R-squared"
+            name="Mean Levels of Fluctuation"
         ),
         go.Scatter(
             x=Time + Time[::-1],  # x, then x reversed
@@ -178,7 +178,7 @@ def drawFigs1(Nodata1,df4,figNone):
                     y=MeanDiff,
                     line=dict(color='rgb(0,100,80)'),
                     mode='lines',
-                    name="Mean Levels of Fluctuation"
+                    name="Change of Mean Levels of Fluctuation"
                 ),
                 go.Scatter(
                     x=Time+Time[::-1], # x, then x reversed
@@ -230,7 +230,7 @@ def drawFigs2(Nodata1,Nodata2,df2,df1,figNone):
                     y=MeanDiff,
                     line=dict(color='rgb(0,100,80)'),
                     mode='lines',
-                    name="Mean Levels of Fluctuation"
+                    name="Change of Mean Levels of Fluctuation"
                 ),
                 go.Scatter(
                     x=Time+Time[::-1], # x, then x reversed
@@ -455,6 +455,8 @@ app.layout = html.Div(children=[
         )
     ]),
     html.Div([
+        html.H1(children='Daily Warning Messages',
+                style={'font-size': '40px', 'textAlign': 'center'}),
         dash_table.DataTable(id='tbl'),
         dcc.Interval(
             id='interval-component7',
