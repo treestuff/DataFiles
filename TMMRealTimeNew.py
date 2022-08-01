@@ -97,7 +97,7 @@ def loadDf4(df2):
     from datetime import date, timedelta
     import datetime
     current_time = datetime.datetime.now() - timedelta(hours=6)
-    previous_time = current_time - timedelta(hours=24)
+    previous_time = current_time - timedelta(hours=48)
     df2['rs2Time'] = pd.to_datetime(df2['rs2Time'])
     df4 = df2.loc[df2['rs2Time'] >= previous_time]
     return df4
@@ -107,7 +107,7 @@ def loadDf3(df1):
     from datetime import date, timedelta
     import datetime
     current_time = datetime.datetime.now() - timedelta(hours=6)
-    previous_time = current_time - timedelta(hours=24)
+    previous_time = current_time - timedelta(hours=48)
     df1['Start'] = pd.to_datetime(df1['Start'])
     df1['Finish'] = pd.to_datetime(df1['Finish'])
     df3 = df1.loc[df1['Finish'] >= previous_time]
@@ -344,8 +344,8 @@ df2 = loadDf2(treeID,slopeID)
 df1 = loadDf(treeID,slopeID)
 df4 = loadDf4(df2)
 # df3 = loadDf3(df1)
-df5 = loadDf5(treeID,slopeID,24)
-df6 = loadDf6(treeID,slopeID,24)
+df5 = loadDf5(treeID,slopeID,48)
+df6 = loadDf6(treeID,slopeID,48)
 df7 = loadDf7(treeID,slopeID)
 figNone = drawFigNone()
 Nodata1 = 0
@@ -375,7 +375,7 @@ app.layout = html.Div(children=[
         html.Div(id='content'),
     ]),
     html.Div([
-        html.H1(children='Range of Fluctuation and Timeline of Works in the Past 24 Hours',style={'font-size': '40px','textAlign': 'center'}),
+        html.H1(children='Range of Fluctuation and Timeline of Works in the Past 48 Hours',style={'font-size': '40px','textAlign': 'center'}),
 
         dcc.Graph(
             id='graph1',
@@ -426,7 +426,7 @@ app.layout = html.Div(children=[
         dcc.Dropdown(
             id='fig_dropdown',
             options=[{'label': '24 Hours', 'value': '24H'},{'label': '48 Hours', 'value': '48H'},{'label': '72 Hours', 'value': '72H'},{'label': '96 Hours', 'value': '96H'},{'label': '120 Hours', 'value': '120H'}],
-            value='24H'
+            value='48H'
         ),
         dcc.Interval(
             id='interval-component5',
@@ -446,7 +446,7 @@ app.layout = html.Div(children=[
             id='fig_dropdown2',
             options=[{'label': '24 Hours', 'value': '24H'}, {'label': '48 Hours', 'value': '48H'},
                      {'label': '72 Hours', 'value': '72H'},{'label': '96 Hours', 'value': '96H'},{'label': '120 Hours', 'value': '120H'}],
-            value='24H'
+            value='48H'
         ),
         dcc.Interval(
             id='interval-component6',
