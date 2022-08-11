@@ -1,5 +1,6 @@
 Task,Start,Finish,Description,SlopeID,SensorID
 Rainstorm,12/5/2022,13/5/2022,Rainstorm,ALL,ALL
-Charging ,2/6/2022,4/6/2022,"8921, 8913, 8918, 9000 Charging",ALL,ALL
-Charging ,4/6/2022,5/6/2022,8915 Charging,ALL,ALL
+Charging ,2/6/2022,4/6/2022,"8921, 8913, 8918, 9000",ALL,ALL
+Charging ,4/6/2022,5/6/2022,8915,ALL,ALL
 Rainstorm,7/6/2022,8/6/2022,Rainstorm,ALL,ALL
+Typhoon,1/7/2022,2/7/2022,Typhoon,ALL,ALL

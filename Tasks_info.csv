@@ -1,4 +1,10 @@
 Task,Start,Finish,Events,slopeID,treeID
-1,12/5/2022,13/5/2022,Rainstorm,ALL,ALL
-5,26/5/2022,27/5/2022,Pruning,SA1745,TS015
-6,7/6/2022,8/6/2022,Rainstorm,ALL,ALL
+Rainstorm,12/5/2022,13/5/2022,Rainstorm,ALL,ALL
+Pruning,26/5/2022,27/5/2022,Pruning,SA1745,TS015
+Rainstorm,7/6/2022,8/6/2022,Rainstorm,ALL,ALL
+Pruning,11/6/2022,11/6/2022,Pruning,SA2322,TS001
+Charging,22/6/2022,23/6/2022,Charging,SA1745,"TS008, TS013, TS015"
+Typhoon,1/7/2022,2/7/2022,Typhoon,ALL,ALL
+Pruning,7/7/2022,7/7/2022,Pruning,SA1745,TS013
+Pruning,13/7/2022,13/7/2022,Pruning,SA1707,TS001
+Charging,19/7/2022,20/7/2022,Charging,SA2322,TS001
