@@ -3,7 +3,11 @@ import plotly.express as px
 import pandas as pd
 import datetime
 import numpy as np
-
+import datetime
+from dateutil.relativedelta import relativedelta
+monthDiff = 2
+today = datetime.date.today()
+monthsAgo = today - relativedelta(months=monthDiff)
 slopeID = 0
 sensorID = 0
 
@@ -72,16 +76,54 @@ dfWork['SlopeID'] = dfWork['SlopeID'].fillna(slopeID)
 dfWork['SensorID'] = dfWork['SensorID'].fillna(sensorID)
 dfWork = dfWork.loc[(dfWork['SlopeID'] == slopeID) | (dfWork['SlopeID'] == 'ALL'), :]
 dfWork = dfWork.loc[(dfWork['SensorID'] == sensorID) | (dfWork['SensorID'] == 'ALL'), :]
+dfWork = dfWork[~(dfWork['Start'] < monthsAgo)].reset_index(drop=True)
+if len(dfWork) == 0:
+    today = datetime.date.today()
+    yesterday = today - relativedelta(days=1)
+    task = 'Place Holder'
+    description = 'None'
+    slopeID = 'None'
+    sensorID = 'None'
+    data = [{'Task': task,
+             'Start': yesterday,
+             'Finish': today,
+             'Description': description,
+             'SlopeID': slopeID,
+             'SensorID': sensorID
+             }]
+    dfWork = pd.DataFrame(data)
 def reloadWork(slopeID, sensorID):
     dfWork = pd.read_csv('Task_Info_Flex.csv')
+    today = datetime.date.today()
+    monthsAgo = today - relativedelta(months=monthDiff)
     for i in range(0, len(dfWork)):
         dfWork['Start'][i] = datetime.datetime.strptime(dfWork['Start'][i], '%d/%m/%Y').date()
     for i in range(0, len(dfWork)):
         dfWork['Finish'][i] = datetime.datetime.strptime(dfWork['Finish'][i], '%d/%m/%Y').date()
+    toDrop = list()
+    for i in range(0, len(dfWork)):
+        if dfWork.iloc[i]['Start'] < monthsAgo:
+            toDrop.append(i)
+    dfWork = dfWork.drop(toDrop, axis=0).reset_index(drop=True)
     dfWork['SlopeID'] = dfWork['SlopeID'].fillna(slopeID)
     dfWork['SensorID'] = dfWork['SensorID'].fillna(sensorID)
     dfWork = dfWork.loc[(dfWork['SlopeID'] == slopeID) | (dfWork['SlopeID'] == 'ALL'), :]
     dfWork = dfWork.loc[(dfWork['SensorID'] == sensorID) | (dfWork['SensorID'] == 'ALL'), :]
+    if len(dfWork) == 0:
+        today = datetime.date.today()
+        yesterday = today - relativedelta(days=1)
+        task = 'Place Holder'
+        description = 'None'
+        slopeID = 'None'
+        sensorID = 'None'
+        data = [{'Task': task,
+                'Start': yesterday,
+                'Finish': today,
+                'Description': description,
+                'SlopeID': slopeID,
+                'SensorID': sensorID
+                }]
+        dfWork = pd.DataFrame(data)
     return dfWork
 # Color = ['rgb(0, 0, 0)','rgb(0, 0, 0)','rgb(0, 0, 0)']
 # Jobs = ['JobA','JobB','JobC']
@@ -167,3 +209,4 @@ ADDRESS = "0.0.0.0"
 if __name__ == '__main__':
     app.run_server(host=ADDRESS,port=PORT, debug=True, threaded=True)
 
+# http://127.0.0.1:8055/
