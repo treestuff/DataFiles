@@ -30,7 +30,8 @@ z = df.to_numpy()
 
 dates = list(df)
 for i, date in enumerate(dates):
-    dates[i] = datetime.date.fromisoformat(date)
+    #dates[i] = datetime.datetime.strptime(date, '%d/%m/%Y').date()
+    dates[i] = datetime.datetime.strptime(date, '%Y-%m-%d').date()
 dates = np.array(dates)
 
 def reloadData():
@@ -53,7 +54,8 @@ def reloadData():
 
     dates = list(df)
     for i, date in enumerate(dates):
-        dates[i] = datetime.date.fromisoformat(date)
+        #dates[i] = datetime.datetime.strptime(date, '%d/%m/%Y').date()
+        dates[i] = datetime.datetime.strptime(date, '%Y-%m-%d').date()
     dates = np.array(dates)
     return SensorIDs, dates, z
 
@@ -139,7 +141,7 @@ app.layout = html.Div([
             html.P("Sensor A SN: 890771058921"),
             html.P("Sensor B SN: 890771058913"),
             html.P("Sensor C SN: 890771058918"),
-            html.P("Sensor D SN: 890771059000"),
+            html.P("Sensor D SN: 890771059014"),
             html.P("Sensor E SN: 890771058915"),
         ],style={'width': '30%', 'display': 'inline-block'})
 ])
